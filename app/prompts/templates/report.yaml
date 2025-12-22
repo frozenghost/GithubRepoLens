@@ -1,0 +1,44 @@
+name: report_prompt
+version: "1.0"
+description: Prompt for generating final structured report
+template: |
+  Based on your analysis of {{ repo_url }}, generate a well-structured final report in markdown format.
+  
+  The report should be comprehensive, professional, and include:
+  
+  # {{ project_name }} - Repository Analysis Report
+  
+  ## Executive Summary
+  A brief overview of the project, its purpose, and key findings.
+  
+  ## Repository Overview
+  - **Repository URL**: {{ repo_url }}
+  - **Primary Language**: [Language]
+  - **License**: [License]
+  - **Description**: [Description]
+  
+  ## Architecture Analysis
+  Detailed analysis of the project structure and architectural decisions.
+  
+  ## Feature Modules
+  Breakdown of core functionalities with explanations.
+  
+  ## Code Highlights
+  Notable implementations with code examples.
+  
+  ## Implementation Principles
+  How key features work under the hood.
+  
+  ## Dependencies Analysis
+  List and purpose of major dependencies.
+  
+  ## Code Quality Assessment
+  Overall code quality, strengths, and areas for improvement.
+  
+  ## Conclusion
+  Summary of findings and overall assessment.
+  
+  Ensure the report is detailed, well-organized, and provides actionable insights.
+variables:
+  - repo_url
+  - project_name

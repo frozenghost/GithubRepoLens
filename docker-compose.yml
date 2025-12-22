@@ -1,0 +1,113 @@
+version: '3.8'
+
+services:
+  # Redis - Message broker and result backend for Celery
+  redis:
+    image: redis:7-alpine
+    container_name: githubrepolens-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - githubrepolens
+
+  # FastAPI Application
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: githubrepolens-api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - REPORT_OUTPUT_DIR=/app/reports
+    volumes:
+      - ./app:/app/app
+      - ./reports:/app/reports
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - githubrepolens
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # Celery Worker for PDF generation
+  celery-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: githubrepolens-celery-worker
+    env_file:
+      - .env
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - REPORT_OUTPUT_DIR=/app/reports
+    volumes:
+      - ./app:/app/app
+      - ./reports:/app/reports
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - githubrepolens
+    command: celery -A app.tasks.celery_tasks:celery_app worker --loglevel=info --concurrency=2
+
+  # Celery Beat for scheduled tasks (optional)
+  celery-beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: githubrepolens-celery-beat
+    env_file:
+      - .env
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    volumes:
+      - ./app:/app/app
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - githubrepolens
+    command: celery -A app.tasks.celery_tasks:celery_app beat --loglevel=info
+
+  # Flower - Celery monitoring tool (optional)
+  flower:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: githubrepolens-flower
+    ports:
+      - "5555:5555"
+    env_file:
+      - .env
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - githubrepolens
+    command: celery -A app.tasks.celery_tasks:celery_app flower --port=5555
+
+volumes:
+  redis_data:
+    driver: local
+
+networks:
+  githubrepolens:
+    driver: bridge

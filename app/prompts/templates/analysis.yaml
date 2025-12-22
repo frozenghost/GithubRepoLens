@@ -1,0 +1,49 @@
+name: analysis_prompt
+version: "1.0"
+description: Prompt for detailed repository analysis
+template: |
+  Analyze the GitHub repository {{ repo_url }} and provide a comprehensive report covering:
+  
+  ## 1. Repository Overview
+  - Project name, description, and purpose
+  - Primary programming languages used
+  - Repository statistics (if available)
+  - License information
+  
+  ## 2. Architecture Analysis
+  - Overall project structure and organization
+  - Key directories and their purposes
+  - Architectural patterns employed (MVC, microservices, etc.)
+  - Module/component relationships
+  
+  ## 3. Feature Modules
+  - Core functionalities and features
+  - How different modules interact
+  - Main entry points and workflows
+  
+  ## 4. Code Highlights
+  - Notable implementations worth highlighting
+  - Clever solutions or optimizations
+  - Best practices demonstrated
+  - Interesting algorithms or data structures
+  
+  ## 5. Implementation Principles
+  - How key features are implemented
+  - Design patterns used (Singleton, Factory, Observer, etc.)
+  - Code organization strategies
+  - Error handling approaches
+  
+  ## 6. Dependencies Analysis
+  - External libraries and frameworks used
+  - Purpose of major dependencies
+  - Dependency management approach
+  
+  ## 7. Code Quality Assessment
+  - Code style and consistency
+  - Documentation quality
+  - Test coverage (if tests exist)
+  - Potential improvements or concerns
+  
+  Use the available tools to explore the repository systematically. Provide specific examples with file paths and code snippets where relevant.
+variables:
+  - repo_url
