@@ -333,20 +333,21 @@ class RepositoryAnalysisAgent:
         logger.info("Asynchronous analysis completed")
         return final_state
 
-    async def stream_analysis(self, repo_url: str):
-        """Stream analysis progress in real-time.
+    async def stream_analysis(self, repo_url: str, language: str = "en"):
+        """Stream analysis progress in real-time with token-level streaming.
 
         Args:
             repo_url: GitHub repository URL
+            language: Analysis report language (en, zh, ja, etc.)
 
         Yields:
-            State updates as they occur
+            State updates and token chunks as they occur
         """
-        logger.info(f"Starting streaming analysis for {repo_url}")
+        logger.info(f"Starting streaming analysis for {repo_url} (language: {language})")
 
         # Load system and analysis prompts
-        system_prompt = self.prompt_loader.render("system", repo_url=repo_url)
-        analysis_prompt = self.prompt_loader.render("analysis", repo_url=repo_url)
+        system_prompt = self.prompt_loader.render("system", repo_url=repo_url, language=language)
+        analysis_prompt = self.prompt_loader.render("analysis", repo_url=repo_url, language=language)
 
         # Combine prompts
         full_prompt = f"{system_prompt}\n\n{analysis_prompt}"
@@ -358,10 +359,35 @@ class RepositoryAnalysisAgent:
             "analysis_stage": "init",
         }
 
-        # Stream the graph execution
-        async for event in self.graph.astream(initial_state, stream_mode="updates"):
-            logger.debug(f"Stream event: {event}")
-            yield event
+        # Stream the graph execution with messages mode for token streaming
+        async for event in self.graph.astream_events(initial_state, version="v2"):
+            kind = event.get("event")
+            
+            # Token streaming from LLM
+            if kind == "on_chat_model_stream":
+                chunk = event.get("data", {}).get("chunk")
+                if chunk and hasattr(chunk, "content") and chunk.content:
+                    yield {
+                        "type": "token",
+                        "content": chunk.content,
+                    }
+            
+            # Tool calls
+            elif kind == "on_chat_model_end":
+                output = event.get("data", {}).get("output")
+                if output and hasattr(output, "tool_calls") and output.tool_calls:
+                    yield {
+                        "type": "tool_calls",
+                        "tool_calls": output.tool_calls,
+                    }
+            
+            # Tool execution results
+            elif kind == "on_tool_end":
+                yield {
+                    "type": "tool_result",
+                    "name": event.get("name"),
+                    "output": event.get("data", {}).get("output"),
+                }
 
         logger.info("Streaming analysis completed")
 

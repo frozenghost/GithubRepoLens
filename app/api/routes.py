@@ -20,7 +20,7 @@ from app.config import get_settings
 from app.services.analyzer import create_analyzer
 from app.tasks.celery_tasks import generate_pdf_report_task
 
-router = APIRouter(prefix="/api/v1", tags=["analysis"])
+router = APIRouter(prefix="/api", tags=["analysis"])
 
 
 @router.get("/health", response_model=HealthResponse)
@@ -40,19 +40,20 @@ async def analyze_repository(request: AnalyzeRequest) -> StreamingResponse:
     """Analyze repository and stream progress via SSE.
 
     Args:
-        request: Analysis request with repository URL
+        request: Analysis request with repository URL and language
 
     Returns:
         SSE streaming response with real-time analysis progress
     """
     repo_url = str(request.repo_url)
-    logger.info(f"Starting analysis for {repo_url}")
+    language = request.language
+    logger.info(f"Starting analysis for {repo_url} (language: {language})")
 
     async def event_generator() -> AsyncGenerator[str, None]:
         """Generate SSE events from analysis stream."""
         try:
             async with create_analyzer() as analyzer:
-                async for event in analyzer.stream_analysis(repo_url):
+                async for event in analyzer.stream_analysis(repo_url, language=language):
                     yield event.to_sse_format()
         except Exception as e:
             logger.error(f"Error in SSE stream: {e}")
@@ -100,7 +101,7 @@ async def generate_pdf_report(request: PDFReportRequest) -> PDFReportResponse:
     return PDFReportResponse(
         task_id=task.id,
         status="pending",
-        status_url=f"/api/v1/report/pdf/{task.id}",
+        status_url=f"/api/report/pdf/{task.id}",
     )
 
 

@@ -2,7 +2,7 @@ name: analysis_prompt
 version: "1.0"
 description: Prompt for detailed repository analysis
 template: |
-  Analyze the GitHub repository {{ repo_url }} and provide a comprehensive report covering:
+  Analyze the GitHub repository {{ repo_url }} and provide a comprehensive report in {{ language }} language covering:
   
   ## 1. Repository Overview
   - Project name, description, and purpose
@@ -45,5 +45,8 @@ template: |
   - Potential improvements or concerns
   
   Use the available tools to explore the repository systematically. Provide specific examples with file paths and code snippets where relevant.
+  
+  IMPORTANT: Write the entire analysis report in {{ language }} language.
 variables:
   - repo_url
+  - language

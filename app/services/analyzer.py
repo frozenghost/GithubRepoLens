@@ -102,12 +102,13 @@ class RepositoryAnalyzer:
         return result
 
     async def stream_analysis(
-        self, repo_url: str
+        self, repo_url: str, language: str = "en"
     ) -> AsyncGenerator[AnalysisEvent, None]:
         """Stream analysis progress in real-time.
 
         Args:
             repo_url: GitHub repository URL
+            language: Analysis report language (en, zh, ja, etc.)
 
         Yields:
             Analysis events
@@ -118,7 +119,7 @@ class RepositoryAnalyzer:
         if self._agent is None:
             raise RuntimeError("Analyzer not initialized. Call initialize() first.")
 
-        logger.info(f"Starting streaming analysis for {repo_url}")
+        logger.info(f"Starting streaming analysis for {repo_url} (language: {language})")
 
         # Send start event
         yield AnalysisEvent(
@@ -128,71 +129,51 @@ class RepositoryAnalyzer:
 
         try:
             # Stream analysis events
-            async for event in self._agent.stream_analysis(repo_url):
-                # Process different event types
-                for node_name, node_output in event.items():
-                    if node_name == "agent":
-                        # Agent node output
-                        messages = node_output.get("messages", [])
-                        if messages:
-                            last_message = messages[-1]
-                            
-                            # Check if agent is making tool calls
-                            if hasattr(last_message, "tool_calls") and last_message.tool_calls:
-                                # Simplify tool call display
-                                tool_names = [tc["name"] for tc in last_message.tool_calls]
-                                tool_args = [tc.get("args", {}) for tc in last_message.tool_calls]
-                                
-                                for tool_name, args in zip(tool_names, tool_args):
-                                    if tool_name == "read_file" and "path" in args:
-                                        message = f"IsAnalyzingFile {args['path']}"
-                                    elif tool_name == "list_directory" and "path" in args:
-                                        message = f"IsListingDirectory {args['path']}"
-                                    elif tool_name == "get_repo_structure":
-                                        message = f"IsGettingRepoStructure"
-                                    else:
-                                        message = f"IsExecuting {tool_name}"
-                                    
-                                    yield AnalysisEvent(
-                                        event_type="tool_call",
-                                        data={
-                                            "node": node_name,
-                                            "message": message,
-                                            "tool": tool_name,
-                                        },
-                                    )
-                            else:
-                                # Regular agent response
-                                content = last_message.content if hasattr(last_message, "content") else str(last_message)
-                                if content and content.strip():
-                                    yield AnalysisEvent(
-                                        event_type="agent_response",
-                                        data={
-                                            "node": node_name,
-                                            "content": content,
-                                        },
-                                    )
-                    elif node_name == "tools":
-                        # Tool execution output - simplified
-                        messages = node_output.get("messages", [])
-                        for msg in messages:
-                            if hasattr(msg, "name"):
-                                tool_name = msg.name
-                                yield AnalysisEvent(
-                                    event_type="tool_result",
-                                    data={
-                                        "node": node_name,
-                                        "message": f"Completed {tool_name}",
-                                        "tool": tool_name,
-                                    },
-                                )
-                    else:
-                        # Generic node output
+            async for event in self._agent.stream_analysis(repo_url, language=language):
+                event_type = event.get("type")
+                
+                # Token-level streaming from LLM
+                if event_type == "token":
+                    content = event.get("content", "")
+                    if content:
                         yield AnalysisEvent(
-                            event_type="progress",
+                            event_type="token",
+                            data={"content": content},
+                        )
+                
+                # Tool calls
+                elif event_type == "tool_calls":
+                    tool_calls = event.get("tool_calls", [])
+                    for tool_call in tool_calls:
+                        tool_name = tool_call.get("name")
+                        args = tool_call.get("args", {})
+                        
+                        if tool_name == "read_file" and "path" in args:
+                            message = f"IsAnalyzingFile {args['path']}"
+                        elif tool_name == "list_directory" and "path" in args:
+                            message = f"IsListingDirectory {args['path']}"
+                        elif tool_name == "get_repo_structure":
+                            message = f"IsGettingRepoStructure"
+                        else:
+                            message = f"IsExecuting {tool_name}"
+                        
+                        yield AnalysisEvent(
+                            event_type="tool_call",
                             data={
-                                "node": node_name,
-                                "output": str(node_output),
+                                "message": message,
+                                "tool": tool_name,
+                            },
+                        )
+                
+                # Tool execution results
+                elif event_type == "tool_result":
+                    tool_name = event.get("name")
+                    if tool_name:
+                        yield AnalysisEvent(
+                            event_type="tool_result",
+                            data={
+                                "message": f"Completed {tool_name}",
+                                "tool": tool_name,
                             },
                         )
 

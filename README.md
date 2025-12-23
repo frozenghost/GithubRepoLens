@@ -88,22 +88,25 @@ Edit `.env` file:
 
 ### Health Check
 ```
-GET /api/v1/health
+GET /api/health
 ```
 
 ### Analyze Repository (with SSE Streaming)
 ```
-POST /api/v1/analyze
+POST /api/analyze
 Content-Type: application/json
 
-{"repo_url": "https://github.com/owner/repo"}
+{
+  "repo_url": "https://github.com/owner/repo",
+  "language": "en"  // Optional: en (default), zh, ja, etc.
+}
 
 Response: Server-Sent Events (SSE) stream with real-time progress
 ```
 
 ### Generate PDF Report
 ```
-POST /api/v1/report/pdf
+POST /api/report/pdf
 Content-Type: application/json
 
 {
@@ -115,7 +118,7 @@ Content-Type: application/json
 
 ### Check PDF Status
 ```
-GET /api/v1/report/pdf/{task_id}
+GET /api/report/pdf/{task_id}
 ```
 
 ## Testing

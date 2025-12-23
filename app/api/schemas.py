@@ -10,6 +10,9 @@ class AnalyzeRequest(BaseModel):
     """Request schema for repository analysis."""
 
     repo_url: HttpUrl = Field(..., description="GitHub repository URL")
+    language: str = Field(
+        default="en", description="Analysis report language (en, zh, ja, etc.)"
+    )
     llm_provider: Literal["openai", "gemini", "openrouter"] | None = Field(
         None, description="Override default LLM provider"
     )

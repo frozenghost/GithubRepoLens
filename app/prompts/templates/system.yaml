@@ -20,5 +20,8 @@ template: |
   6. Assess code quality and potential improvements
   
   Be thorough, systematic, and provide detailed insights backed by actual code examples.
+  
+  IMPORTANT: You must write your entire analysis report in {{ language }} language.
 variables:
   - repo_url
+  - language
