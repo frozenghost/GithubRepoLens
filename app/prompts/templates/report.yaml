@@ -2,43 +2,36 @@ name: report_prompt
 version: "1.0"
 description: Prompt for generating final structured report
 template: |
-  Based on your analysis of {{ repo_url }}, generate a well-structured final report in markdown format.
-  
-  The report should be comprehensive, professional, and include:
-  
-  # {{ project_name }} - Repository Analysis Report
-  
-  ## Executive Summary
-  A brief overview of the project, its purpose, and key findings.
-  
-  ## Repository Overview
-  - **Repository URL**: {{ repo_url }}
-  - **Primary Language**: [Language]
-  - **License**: [License]
-  - **Description**: [Description]
-  
-  ## Architecture Analysis
-  Detailed analysis of the project structure and architectural decisions.
-  
-  ## Feature Modules
-  Breakdown of core functionalities with explanations.
-  
-  ## Code Highlights
-  Notable implementations with code examples.
-  
-  ## Implementation Principles
-  How key features work under the hood.
-  
-  ## Dependencies Analysis
-  List and purpose of major dependencies.
-  
-  ## Code Quality Assessment
-  Overall code quality, strengths, and areas for improvement.
-  
-  ## Conclusion
-  Summary of findings and overall assessment.
-  
-  Ensure the report is detailed, well-organized, and provides actionable insights.
+  Based on your deep research of {{ repo_url }}, generate a beautifully structured and detailed final Markdown report.
+
+  The report should be highly professional, resembling a deep technical white paper. Please ensure it includes the following sections:
+
+  # {{ project_name }} - Technical Perspective Analysis
+
+  ## 0. Executive Summary
+  Concisely summarize the essence of the project, its core value, and most significant technical characteristics.
+
+  ## 1. Project DNA & Abstractions
+  Thoroughly explain the core problem the project solves and its abstract modeling of the real world.
+
+  ## 2. Deep Architectural Analysis
+  - **Logical Architecture**: Use Mermaid syntax to draw a global or local architecture diagram.
+  - **Core Logic Flow**: Use Mermaid sequence diagrams or flowcharts to describe critical business paths.
+  - **Directory & Module Organization**: Explain the logical organization behind the physical directory structure.
+
+  ## 3. Under the Hood (Core Mechanisms)
+  Explain how core features are implemented through deep-dive topics, using clear explanations and code references.
+
+  ## 4. Engineering Excellence (Code Highlights)
+  Showcase the most elegant or efficient code implementations, using standard Markdown code blocks with step-by-step technical insights.
+
+  ## 5. Ecosystem & Technical Choices
+  Objectively analyze the reasoning behind major third-party library selections and how they integrate with the core system.
+
+  ## 6. Trade-offs & Future Outlook
+  Based on the current state of the code, objectively discuss the technical strengths and potential limitations in specific scenarios.
+
+  Ensure the report is detail-rich, visually engaging (utilizing Mermaid diagrams and code blocks), and provides deep resonance for the reader.
 variables:
   - repo_url
   - project_name
