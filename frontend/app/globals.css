@@ -1,0 +1,131 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+:root {
+  /* Clean Tech Theme - Light Mode */
+  --background: #f8fafc; /* slate-50 */
+  --foreground: #0f172a; /* slate-900 */
+  
+  --card: rgba(255, 255, 255, 0.8);
+  --card-foreground: #1e293b; /* slate-800 */
+  
+  --primary: #0ea5e9; /* sky-500 */
+  --primary-hover: #0284c7; /* sky-600 */
+  --primary-foreground: #ffffff;
+  
+  --secondary: #06b6d4; /* cyan-500 */
+  --secondary-foreground: #ffffff;
+  
+  --muted: #f1f5f9; /* slate-100 */
+  --muted-foreground: #64748b; /* slate-500 */
+  
+  --accent: #e0f2fe; /* sky-100 */
+  --accent-foreground: #0369a1; /* sky-700 */
+  
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  
+  --border: #e2e8f0; /* slate-200 */
+  --input: #e2e8f0;
+  --ring: #0ea5e9;
+  
+  /* Specific UI Colors */
+  --tool-bg: #f1f5f9; /* slate-100 */
+  --tool-border: #e2e8f0; /* slate-200 */
+  --tool-text: #475569; /* slate-600 */
+  --tool-icon: #0ea5e9; /* sky-600 */
+  --tool-pulse: #38bdf8; /* sky-400 */
+  
+  --gradient-from: #f8fafc; /* slate-50 */
+  --gradient-to: #f1f5f9; /* slate-100 */
+  
+  --window-dot: #cbd5e1; /* slate-300 */
+  --window-text: #94a3b8; /* slate-400 */
+  
+  --error-bg: #fef2f2; /* red-50 */
+  --error-text: #dc2626; /* red-600 */
+  --error-border: #fee2e2; /* red-100 */
+  
+  --blob-1: rgba(224, 242, 254, 0.3); /* sky-100 with opacity */
+  --blob-2: rgba(207, 250, 254, 0.3); /* cyan-100 with opacity */
+  --blob-3: rgba(226, 232, 240, 0.3); /* slate-200 with opacity */
+  
+  --radius: 0.5rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-tool-bg: var(--tool-bg);
+  --color-tool-border: var(--tool-border);
+  --color-tool-text: var(--tool-text);
+  --color-tool-icon: var(--tool-icon);
+  --color-tool-pulse: var(--tool-pulse);
+  --color-gradient-from: var(--gradient-from);
+  --color-gradient-to: var(--gradient-to);
+  --color-window-dot: var(--window-dot);
+  --color-window-text: var(--window-text);
+  --color-error-bg: var(--error-bg);
+  --color-error-text: var(--error-text);
+  --color-error-border: var(--error-border);
+  --color-blob-1: var(--blob-1);
+  --color-blob-2: var(--blob-2);
+  --color-blob-3: var(--blob-3);
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: calc(var(--radius));
+  --radius-lg: calc(var(--radius) + 2px);
+  
+  --animate-scan: scan 2s linear infinite;
+  --animate-blob: blob 7s infinite;
+  --animate-cursor-blink: cursor-blink 1s step-end infinite;
+
+  @keyframes scan {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  @keyframes blob {
+    0% { transform: translate(0px, 0px) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+    100% { transform: translate(0px, 0px) scale(1); }
+  }
+
+  @keyframes cursor-blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+}
+
+/* Custom utility for animation delay */
+@utility animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+@utility animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+}

@@ -70,6 +70,7 @@ async def analyze_repository(request: AnalyzeRequest) -> StreamingResponse:
             "Cache-Control": "no-cache",
             "Connection": "keep-alive",
             "X-Accel-Buffering": "no",  # Disable buffering for nginx
+            "Content-Encoding": "None",  # Disable compression for streaming
         },
     )
 

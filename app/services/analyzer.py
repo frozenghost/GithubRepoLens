@@ -1,7 +1,7 @@
 """Repository analyzer service with SSE streaming support."""
 
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import AsyncGenerator
 
 from loguru import logger
@@ -30,7 +30,7 @@ class AnalysisEvent:
         """
         self.event_type = event_type
         self.data = data
-        self.timestamp = timestamp or datetime.utcnow()
+        self.timestamp = timestamp or datetime.now(timezone.utc)
 
     def to_sse_format(self) -> str:
         """Convert event to SSE format.
@@ -41,7 +41,7 @@ class AnalysisEvent:
         event_data = {
             "type": self.event_type,
             "data": self.data,
-            "timestamp": self.timestamp.isoformat(),
+            "timestamp": self.timestamp.isoformat().replace("+00:00", "Z"),
         }
         return f"data: {json.dumps(event_data)}\n\n"
 
