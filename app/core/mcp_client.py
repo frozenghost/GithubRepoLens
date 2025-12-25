@@ -31,18 +31,25 @@ class MCPClientManager:
 
         logger.info("Initializing MCP client for github-repo-mcp")
 
+        # Prepare environment variables for github-repo-mcp
+        server_config_base = {
+            "transport": "stdio",
+        }
+        if self.settings.github_token:
+            server_config_base["env"] = {"GITHUB_TOKEN": self.settings.github_token}
+
         # Configure github-repo-mcp server based on platform
         if sys.platform == "win32":
             server_config = {
                 "command": "cmd",
                 "args": ["/c", "npx", "-y", "github-repo-mcp"],
-                "transport": "stdio",
+                **server_config_base,
             }
         else:
             server_config = {
                 "command": "npx",
                 "args": ["-y", "github-repo-mcp"],
-                "transport": "stdio",
+                **server_config_base,
             }
 
         logger.debug(f"MCP server config: {server_config}")

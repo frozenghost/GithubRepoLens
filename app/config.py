@@ -51,6 +51,9 @@ class Settings(BaseSettings):
     github_repo_url: str | None = Field(
         default=None, description="Default GitHub repository URL"
     )
+    github_token: str | None = Field(
+        default=None, description="GitHub token for github-repo-mcp"
+    )
 
     # MCP Server
     mcp_server: str = Field(default="github-repo-mcp", description="MCP server name")
